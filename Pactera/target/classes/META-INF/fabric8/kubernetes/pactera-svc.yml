@@ -1,0 +1,28 @@
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  annotations:
+    prometheus.io/port: "9779"
+    prometheus.io/scrape: "true"
+    fabric8.io/git-commit: "55a92a403b4294f675a9745057f87c3beaea00b9"
+    fabric8.io/iconUrl: "data:text/plain;charset=UTF-8;base64,YW1xLnhtbApjYW1lbC1jb250ZXh0LnhtbAo="
+    fabric8.io/git-branch: "main"
+  labels:
+    expose: "true"
+    provider: "fabric8"
+    project: "Pactera"
+    version: "1.0-SNAPSHOT"
+    group: "Nani"
+  name: "pactera"
+spec:
+  ports:
+  - name: "http"
+    port: 80
+    protocol: "TCP"
+    targetPort: 8080
+  selector:
+    project: "Pactera"
+    provider: "fabric8"
+    group: "Nani"
+  type: "LoadBalancer"

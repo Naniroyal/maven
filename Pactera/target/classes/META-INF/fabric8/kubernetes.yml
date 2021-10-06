@@ -1,0 +1,105 @@
+---
+apiVersion: "v1"
+kind: "List"
+items:
+- apiVersion: "v1"
+  kind: "Service"
+  metadata:
+    annotations:
+      prometheus.io/port: "9779"
+      prometheus.io/scrape: "true"
+      fabric8.io/git-commit: "55a92a403b4294f675a9745057f87c3beaea00b9"
+      fabric8.io/iconUrl: "data:text/plain;charset=UTF-8;base64,YW1xLnhtbApjYW1lbC1jb250ZXh0LnhtbAo="
+      fabric8.io/git-branch: "main"
+    labels:
+      expose: "true"
+      provider: "fabric8"
+      project: "Pactera"
+      version: "1.0-SNAPSHOT"
+      group: "Nani"
+    name: "pactera"
+  spec:
+    ports:
+    - name: "http"
+      port: 80
+      protocol: "TCP"
+      targetPort: 8080
+    selector:
+      project: "Pactera"
+      provider: "fabric8"
+      group: "Nani"
+    type: "LoadBalancer"
+- apiVersion: "extensions/v1beta1"
+  kind: "Deployment"
+  metadata:
+    annotations:
+      fabric8.io/git-commit: "55a92a403b4294f675a9745057f87c3beaea00b9"
+      fabric8.io/iconUrl: "img/icons/camel.svg"
+      fabric8.io/git-branch: "main"
+      fabric8.io/metrics-path: "dashboard/file/camel-routes.json/?var-project=Pactera&var-version=1.0-SNAPSHOT"
+    labels:
+      provider: "fabric8"
+      project: "Pactera"
+      version: "1.0-SNAPSHOT"
+      group: "Nani"
+    name: "pactera"
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        project: "Pactera"
+        provider: "fabric8"
+        group: "Nani"
+    template:
+      metadata:
+        annotations:
+          fabric8.io/git-commit: "55a92a403b4294f675a9745057f87c3beaea00b9"
+          fabric8.io/iconUrl: "img/icons/camel.svg"
+          fabric8.io/git-branch: "main"
+          fabric8.io/metrics-path: "dashboard/file/camel-routes.json/?var-project=Pactera&var-version=1.0-SNAPSHOT"
+        labels:
+          provider: "fabric8"
+          project: "Pactera"
+          version: "1.0-SNAPSHOT"
+          group: "Nani"
+      spec:
+        containers:
+        - env:
+          - name: "ACTIVEMQ_SERVICE_NAME"
+            value: "activemq"
+          - name: "KUBERNETES_NAMESPACE"
+            valueFrom:
+              fieldRef:
+                fieldPath: "metadata.namespace"
+          image: "nani/pactera:snapshot-211006-200457-0491"
+          imagePullPolicy: "IfNotPresent"
+          livenessProbe:
+            httpGet:
+              path: "/health"
+              port: 8080
+            initialDelaySeconds: 180
+          name: "spring-boot"
+          ports:
+          - containerPort: 8080
+            name: "http"
+            protocol: "TCP"
+          - containerPort: 9779
+            name: "prometheus"
+            protocol: "TCP"
+          - containerPort: 8778
+            name: "jolokia"
+            protocol: "TCP"
+          readinessProbe:
+            httpGet:
+              path: "/health"
+              port: 8080
+            initialDelaySeconds: 10
+          resources:
+            limits:
+              cpu: "0.2"
+              memory: "100Mi"
+            requests:
+              cpu: "0.1"
+              memory: "100Mi"
+          securityContext:
+            privileged: false
